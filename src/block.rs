@@ -79,3 +79,42 @@ impl Hashable for Block {
 pub fn check_difficulty(hash: &Hash, difficulty: u128) -> bool {
     difficulty > difficulty_bytes_as_u128(&hash)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use transaction::*;
+
+    #[test]
+    fn test_new_block() {
+        let inputs = vec![Output {
+            to_addr: String::from("0x0"),
+            value: 0,
+        }];
+        let outputs = vec![Output {
+            to_addr: String::from("0x1"),
+            value: 1,
+        }];
+        let transaction = Transaction { inputs, outputs };
+        let block = Block::new(0, now(), vec![0], vec![transaction], 1);
+        assert_eq!(block.index, 0);
+        // assert_eq!(block.transactions[0], vec![transaction]);
+        assert_eq!(block.difficulty, 1);
+        assert_ne!(block.bytes(), vec![0]);
+    }
+    #[test]
+    fn test_mine() {
+        let inputs = vec![Output {
+            to_addr: String::from("0x0"),
+            value: 0,
+        }];
+        let outputs = vec![Output {
+            to_addr: String::from("0x1"),
+            value: 1,
+        }];
+        let transaction = Transaction { inputs, outputs };
+        let mut block = Block::new(0, now(), vec![0], vec![transaction], 1 << 0xf * 8);
+        block.mine();
+        assert_eq!(check_difficulty(&block.hash, block.difficulty), true);
+    }
+}
