@@ -1,4 +1,4 @@
-use super::*;
+use super::Hash;
 
 pub trait Hashable {
     fn bytes(&self) -> Vec<u8>;
@@ -10,7 +10,9 @@ pub trait Hashable {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::super::u128_bytes;
+    use super::Hashable;
+
     struct HashableObj {
         id: String,
         amount: u128,

@@ -115,6 +115,7 @@ mod tests {
         let transaction = Transaction { inputs, outputs };
         let mut block = Block::new(0, now(), vec![0], vec![transaction], 1 << 0xf * 8);
         block.mine();
+        println!("{:?}", block);
         assert_eq!(check_difficulty(&block.hash, block.difficulty), true);
     }
 }
