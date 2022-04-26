@@ -82,8 +82,9 @@ pub fn check_difficulty(hash: &Hash, difficulty: u128) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use transaction::*;
+    use super::transaction::{Output, Transaction};
+    use super::{check_difficulty, Block, Hashable};
+    use crate::now;
 
     #[test]
     fn test_new_block() {
