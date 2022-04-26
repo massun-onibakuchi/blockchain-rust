@@ -40,11 +40,12 @@ fn main() {
         now(),
         last_hash,
         vec![
+            // Miner coinbase tx
             Transaction {
                 inputs: vec![],
                 outputs: vec![transaction::Output {
-                    to_addr: "Chris".to_owned(),
-                    value: 536,
+                    to_addr: "Miner".to_owned(),
+                    value: 536, // InvalidCoinbaseTransaction
                 }],
             },
             Transaction {
@@ -52,7 +53,7 @@ fn main() {
                 outputs: vec![
                     transaction::Output {
                         to_addr: "Alice".to_owned(),
-                        value: 360,
+                        value: 360, // InsufficientInputValue
                     },
                     transaction::Output {
                         to_addr: "Bob".to_owned(),
@@ -72,5 +73,5 @@ fn main() {
 
     blockchain
         .update_with_block(block)
-        .expect("Failed to add block");
+        .expect("Failed to add block"); // InsufficientInputValue
 }

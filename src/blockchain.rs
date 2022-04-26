@@ -50,6 +50,7 @@ impl Blockchain {
 
         if let Some((coinbase, transactions)) = block.transactions.split_first() {
             if !coinbase.is_coinbase() {
+                // 最初のtxnsがcoinbaseでなければならない
                 return Err(BlockValidationErr::InvalidCoinbaseTransaction);
             }
 
@@ -63,6 +64,8 @@ impl Blockchain {
                 if !(&input_hashes - &self.unspent_outputs).is_empty()
                     || !(&input_hashes & &block_spent).is_empty()
                 {
+                    // 2重支払いチェック
+                    // inputのUTXOがUnspentかつ、同じブロック内で使用されていないことをチェック
                     return Err(BlockValidationErr::InvalidInput);
                 }
 
@@ -73,7 +76,7 @@ impl Blockchain {
                     return Err(BlockValidationErr::InsufficientInputValue);
                 }
 
-                let fee = input_value - output_value;
+                let fee = input_value - output_value; // 超過分はminer fee
 
                 total_fee += fee;
 
@@ -82,17 +85,19 @@ impl Blockchain {
             }
 
             if coinbase.output_value() < total_fee {
+                // minerの受け取ることができるfeeは超過分より少なければならない
                 return Err(BlockValidationErr::InvalidCoinbaseTransaction);
             } else {
                 block_created.extend(coinbase.output_hashes());
             }
 
+            // UTXOのsetをアップデート
             self.unspent_outputs
-                .retain(|output| !block_spent.contains(output));
-            self.unspent_outputs.extend(block_created);
+                .retain(|output| !block_spent.contains(output)); // 使用されたutxoはsetから落とす
+            self.unspent_outputs.extend(block_created); // 新しいutxoを追加する
         }
 
-        self.blocks.push(block);
+        self.blocks.push(block); // progress block
 
         Ok(())
     }
